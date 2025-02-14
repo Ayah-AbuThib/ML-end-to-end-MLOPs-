@@ -1,25 +1,40 @@
+from default_repo.deploy.aws import (
+    IAM_USER_NAME,
+    POLICY_NAME_TERRAFORM_APPLY_DEPLOY_MAGE,
+    POLICY_NAME_TERRAFORM_DESTROY_DELETE_RESOURCES,
+    TERRAFORM_APPLY_URL,
+    TERRAFORM_DESTROY_URL,
+    attach_policy_to_user,
+    create_access_key_for_user,
+    create_policy,
+    create_user,
+    reset,
+    save_credentials_to_file,
+)
+
 if 'custom' not in globals():
     from mage_ai.data_preparation.decorators import custom
-if 'test' not in globals():
-    from mage_ai.data_preparation.decorators import test
 
 
 @custom
-def transform_custom(*args, **kwargs):
-    """
-    args: The output from any upstream parent blocks (if applicable)
+def setup(*args, **kwargs):
+    reset(IAM_USER_NAME)
 
-    Returns:
-        Anything (e.g. data frame, dictionary, array, int, str, etc.)
-    """
-    # Specify your custom logic here
+    # Create IAM Policies
+    terraform_apply_policy_arn = create_policy(
+        POLICY_NAME_TERRAFORM_APPLY_DEPLOY_MAGE, TERRAFORM_APPLY_URL
+    )
+    terraform_destroy_policy_arn = create_policy(
+        POLICY_NAME_TERRAFORM_DESTROY_DELETE_RESOURCES, TERRAFORM_DESTROY_URL
+    )
 
-    return {}
+    # Create the user MageDeployer
+    create_user(IAM_USER_NAME)
 
+    # Attach policies to the user MageDeployer
+    attach_policy_to_user(IAM_USER_NAME, terraform_apply_policy_arn)
+    attach_policy_to_user(IAM_USER_NAME, terraform_destroy_policy_arn)
 
-@test
-def test_output(output, *args) -> None:
-    """
-    Template code for testing the output of the block.
-    """
-    assert output is not None, 'The output is undefined'
+    # Create access key
+    access_key, secret_key = create_access_key_for_user(IAM_USER_NAME)
+    save_credentials_to_file(IAM_USER_NAME, access_key, secret_key)
