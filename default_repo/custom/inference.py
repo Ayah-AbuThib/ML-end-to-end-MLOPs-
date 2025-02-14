@@ -8,47 +8,51 @@ import joblib
 import numpy as np
 import os
 
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
+
+
 @custom
-def transform_custom(*args, **kwargs):
-    """
-    Loads the trained model and makes predictions on the given input data.
-    """
+def transform_custom():
+
+
+    app = FastAPI()
+
+    # Define input schema
+    class DiamondFeatures(BaseModel):
+        carat: float
+        x: float
+        y: float
+        z: float
+        cut_encoded: int
+        color_encoded: int
+        clarity_encoded: int
+        depth: float
+        table: float
+
+    # Load model at startup
     model_path = "default_repo/transformers/random_forest_(tuned).joblib"
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model file not found at {model_path}")
-    
+
     model = joblib.load(model_path)
-    
-    default_inputs = [
-        {
-            'carat': 0.5,
-            'x': 4.2,
-            'y': 4.3,
-            'z': 2.6,
-            'cut_encoded': 3,
-            'color_encoded': 2,
-            'clarity_encoded': 5,
-            'depth': 61.2,
-            'table': 57.0,
-        },
-        {
-            'carat': 1.0,
-            'x': 6.5,
-            'y': 6.6,
-            'z': 4.0,
-            'cut_encoded': 2,
-            'color_encoded': 3,
-            'clarity_encoded': 4,
-            'depth': 62.5,
-            'table': 58.0,
-        },
-    ]
-    
-    input_features = [[entry[key] for key in entry] for entry in default_inputs]
-    
-    predictions = model.predict(np.array(input_features))
-    
-    return predictions.tolist()
+
+    @app.post("/predict")
+    def predict(features: List[DiamondFeatures]):
+        try:
+            input_features = [[
+                f.carat, f.x, f.y, f.z, f.cut_encoded,
+                f.color_encoded, f.clarity_encoded, f.depth, f.table
+            ] for f in features]
+            
+            predictions = model.predict(np.array(input_features))
+            return {"predicted_price": predictions.tolist()}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+
 
 @test
 def test_output(output, *args) -> None:
