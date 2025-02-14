@@ -1,0 +1,3 @@
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "modeling"}, "timestamp": 1739491860, "user": null}
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "predict"}, "timestamp": 1739501380, "user": null}
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "deploying_to_predictions"}, "timestamp": 1739507026, "user": null}

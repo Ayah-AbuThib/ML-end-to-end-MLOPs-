@@ -1,0 +1,16 @@
+data_preprocessing:
+  object_type: pipeline
+  object_uuid: data_preprocessing
+  outdated_after:
+    seconds: 600
+  outdated_starting_at:
+    second_of_minute: null
+  repo_path: /home/src/default_repo
+training_set:
+  object_type: pipeline
+  object_uuid: data_preprocessing
+  outdated_after:
+    seconds: 600
+  repo_path: /home/src/default_repo
+  settings:
+    build: {}

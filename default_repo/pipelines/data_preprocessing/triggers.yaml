@@ -1,0 +1,14 @@
+triggers:
+- description: null
+  envs: []
+  last_enabled_at: 2025-02-14 04:16:01.397690
+  name: real-time protection
+  pipeline_uuid: data_preprocessing
+  schedule_interval: null
+  schedule_type: api
+  settings: null
+  sla: null
+  start_time: 2025-02-14 02:35:00
+  status: active
+  token: 0b6b4922eb4c436f9fb202bd1102f1f1
+  variables: {}
